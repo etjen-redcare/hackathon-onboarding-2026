@@ -512,6 +512,151 @@
     body.demo .phone { cursor: pointer; }
     body.demo .demo-hint { display: block; }
 
+    .presentation-shell {
+      display: none;
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    body.presentation {
+      grid-template-columns: minmax(620px, 1fr) minmax(340px, 440px);
+      align-items: start;
+    }
+
+    body.presentation .phone { display: none; }
+
+    body.presentation .presentation-shell {
+      display: block;
+    }
+
+    body.presentation .notes {
+      max-width: 440px;
+      padding-top: 26px;
+    }
+
+    .presentation-frame {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: 0 24px 70px rgba(40, 24, 18, 0.14);
+    }
+
+    .presentation-top {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .presentation-top h1 {
+      font-size: 27px;
+    }
+
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: var(--red);
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .slide-stage {
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      background: #191817;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d8d0cc;
+    }
+
+    .slide-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: white;
+      display: block;
+    }
+
+    .presentation-controls {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+      gap: 12px;
+      align-items: center;
+      margin: 14px 0;
+    }
+
+    .presentation-controls button {
+      min-height: 44px;
+      font-size: 14px;
+    }
+
+    .slide-counter {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .thumb-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      max-height: 196px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .slide-thumb {
+      width: 100%;
+      min-height: 0;
+      padding: 0;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      overflow: hidden;
+      background: white;
+      aspect-ratio: 16 / 9;
+    }
+
+    .slide-thumb.active {
+      border-color: var(--red);
+      box-shadow: 0 0 0 2px rgba(228, 0, 58, 0.16);
+    }
+
+    .slide-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .presentation-card {
+      display: none;
+      margin-top: 22px;
+      padding: 20px;
+      border-radius: 24px;
+      background: white;
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 32px rgba(40, 24, 18, 0.1);
+    }
+
+    .presentation-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    body.presentation .presentation-card { display: block; }
+
     @media (max-width: 860px) {
       body {
         grid-template-columns: 1fr;
@@ -519,6 +664,19 @@
       }
 
       .notes { display: none; }
+
+      body.presentation {
+        grid-template-columns: 1fr;
+      }
+
+      body.presentation .notes {
+        display: block;
+        padding-top: 0;
+      }
+
+      .thumb-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
   </style>
 </head>
@@ -675,12 +833,34 @@
     <div class="demo-hint">Tap the phone to continue</div>
   </main>
 
+  <section class="presentation-shell" aria-label="Hosted presentation">
+    <div class="presentation-frame">
+      <div class="presentation-top">
+        <div>
+          <h1>Onboarding recommendation deck</h1>
+          <p>Use the controls, thumbnails, or keyboard arrows to move through the story.</p>
+        </div>
+        <a class="download-link" href="presentation/redcare-onboarding-recommendation-deck.pptx" download>Download PPTX</a>
+      </div>
+      <div class="slide-stage">
+        <img id="presentationSlide" alt="Presentation slide 1">
+      </div>
+      <div class="presentation-controls">
+        <button class="secondary" data-slide-prev>Previous</button>
+        <div class="slide-counter" id="slideCounter">Slide 1 of 18</div>
+        <button data-slide-next>Next</button>
+      </div>
+      <div class="thumb-strip" id="slideThumbs" aria-label="Slide thumbnails"></div>
+    </div>
+  </section>
+
   <aside class="notes">
     <h1>English onboarding prototype</h1>
     <p>The first session is now a router: consent, then eRx or shopping. Login, RedPoints, and push are delayed until the selected job makes them useful.</p>
     <p>Use Demo for a tap-through walkthrough, or jump to any individual screen for discussion.</p>
     <div class="nav">
       <button data-demo-start>Demo</button>
+      <button data-presentation-start>Presentation</button>
       <button data-go="consent">Consent</button>
       <button data-go="intent">Intent split</button>
       <button data-go="shop-home">Shop branch</button>
@@ -699,6 +879,15 @@
         <button data-demo-next>Next step</button>
       </div>
     </div>
+    <div class="presentation-card">
+      <div class="demo-meta">Hosted deck</div>
+      <h2>Presentation mode</h2>
+      <p>The full 18-slide recommendation deck is hosted here as a slide viewer, with the PPTX available for download.</p>
+      <div class="demo-actions">
+        <button class="secondary" data-slide-prev>Previous</button>
+        <button data-slide-next>Next slide</button>
+      </div>
+    </div>
   </aside>
 
   <script>
@@ -708,6 +897,11 @@
     const demoTitle = document.getElementById("demoTitle");
     const demoCopy = document.getElementById("demoCopy");
     const demoProgress = document.getElementById("demoProgress");
+    const presentationSlide = document.getElementById("presentationSlide");
+    const slideCounter = document.getElementById("slideCounter");
+    const slideThumbs = document.getElementById("slideThumbs");
+    const slideCount = 18;
+    const slideImages = Array.from({ length: slideCount }, (_, index) => "presentation/slides/slide-" + (index + 1) + ".png");
 
     const demoSteps = [
       {
@@ -754,6 +948,7 @@
 
     let demoMode = false;
     let demoIndex = 0;
+    let slideIndex = 0;
 
     function show(name, options = {}) {
       const target = screens.find((screen) => screen.dataset.screen === name) || screens[0];
@@ -767,8 +962,10 @@
     function updateNav(activeScreen) {
       navButtons.forEach((button) => {
         const isDemo = button.hasAttribute("data-demo-start");
+        const isPresentation = button.hasAttribute("data-presentation-start");
         const isScreen = button.dataset.go === activeScreen;
-        button.classList.toggle("active", demoMode ? isDemo : isScreen);
+        const presentationMode = document.body.classList.contains("presentation");
+        button.classList.toggle("active", presentationMode ? isPresentation : demoMode ? isDemo : isScreen);
       });
     }
 
@@ -797,12 +994,17 @@
     function startDemo(index = 0) {
       demoMode = true;
       demoIndex = index;
+      document.body.classList.remove("presentation");
       renderDemoStep();
     }
 
     function stopDemo() {
       demoMode = false;
       document.body.classList.remove("demo");
+    }
+
+    function stopPresentation() {
+      document.body.classList.remove("presentation");
     }
 
     function advanceDemo() {
@@ -817,9 +1019,55 @@
       renderDemoStep();
     }
 
+    function renderSlideThumbs() {
+      if (slideThumbs.children.length) return;
+      slideImages.forEach((src, index) => {
+        const button = document.createElement("button");
+        const image = document.createElement("img");
+        button.className = "slide-thumb";
+        button.type = "button";
+        button.setAttribute("aria-label", "Show slide " + (index + 1));
+        button.dataset.slideIndex = index;
+        image.src = src;
+        image.alt = "";
+        button.append(image);
+        slideThumbs.append(button);
+      });
+    }
+
+    function setSlide(index) {
+      slideIndex = (index + slideCount) % slideCount;
+      presentationSlide.src = slideImages[slideIndex];
+      presentationSlide.alt = "Presentation slide " + (slideIndex + 1);
+      slideCounter.textContent = "Slide " + (slideIndex + 1) + " of " + slideCount;
+      Array.from(slideThumbs.children).forEach((thumb, index) => {
+        thumb.classList.toggle("active", index === slideIndex);
+      });
+    }
+
+    function showPresentation(index = slideIndex) {
+      stopDemo();
+      document.body.classList.add("presentation");
+      renderSlideThumbs();
+      setSlide(index);
+      updateNav();
+      if (location.hash.slice(1) !== "presentation") {
+        history.replaceState(null, "", "#presentation");
+      }
+    }
+
+    function advanceSlide(step) {
+      showPresentation(slideIndex + step);
+    }
+
     document.addEventListener("click", (event) => {
       if (event.target.closest("[data-demo-start]")) {
         startDemo();
+        return;
+      }
+
+      if (event.target.closest("[data-presentation-start]")) {
+        showPresentation();
         return;
       }
 
@@ -833,11 +1081,28 @@
         return;
       }
 
+      if (event.target.closest("[data-slide-prev]")) {
+        advanceSlide(-1);
+        return;
+      }
+
+      if (event.target.closest("[data-slide-next]")) {
+        advanceSlide(1);
+        return;
+      }
+
+      const slideThumb = event.target.closest("[data-slide-index]");
+      if (slideThumb) {
+        showPresentation(Number(slideThumb.dataset.slideIndex));
+        return;
+      }
+
       const target = event.target.closest("[data-go]");
       if (target) {
         if (demoMode) {
           demoGo(target.dataset.go);
         } else {
+          stopPresentation();
           show(target.dataset.go);
         }
         return;
@@ -848,14 +1113,23 @@
       }
     });
 
+    document.addEventListener("keydown", (event) => {
+      if (!document.body.classList.contains("presentation")) return;
+      if (event.key === "ArrowRight") advanceSlide(1);
+      if (event.key === "ArrowLeft") advanceSlide(-1);
+    });
+
     if (new URLSearchParams(location.search).has("capture")) {
       document.body.classList.add("capture");
     }
 
-    if (location.hash.slice(1) === "demo") {
+    if (location.hash.slice(1) === "presentation") {
+      showPresentation(0);
+    } else if (location.hash.slice(1) === "demo") {
       startDemo();
     } else {
       stopDemo();
+      stopPresentation();
       show(location.hash.slice(1) || "consent");
     }
   </script>
