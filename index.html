@@ -80,7 +80,22 @@
       overflow: hidden;
     }
 
-    .screen.active { display: flex; flex-direction: column; }
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      animation: screenIn 220ms ease-out;
+    }
+
+    @keyframes screenIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .logo {
       display: flex;
@@ -418,6 +433,85 @@
       border: 1px solid var(--line);
     }
 
+    .nav button.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+
+    .demo-card {
+      display: none;
+      margin-top: 22px;
+      padding: 20px;
+      border-radius: 24px;
+      background: white;
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 32px rgba(40, 24, 18, 0.1);
+    }
+
+    .demo-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .demo-meta {
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    .demo-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .demo-actions button {
+      flex: 1;
+      min-height: 42px;
+      font-size: 14px;
+    }
+
+    .demo-progress {
+      display: flex;
+      gap: 7px;
+      margin-top: 16px;
+    }
+
+    .demo-dot {
+      width: 28px;
+      height: 6px;
+      border-radius: 999px;
+      background: #eadeda;
+    }
+
+    .demo-dot.active { background: var(--red); }
+
+    body.demo .demo-card { display: block; }
+
+    .demo-hint {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(27, 28, 27, 0.88);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      pointer-events: none;
+      box-shadow: 0 10px 22px rgba(40, 24, 18, 0.2);
+    }
+
+    body.demo .phone { cursor: pointer; }
+    body.demo .demo-hint { display: block; }
+
     @media (max-width: 860px) {
       body {
         grid-template-columns: 1fr;
@@ -578,13 +672,15 @@
         <button class="secondary" style="margin-top:12px;" data-go="shop-home">Decide later</button>
       </div>
     </section>
+    <div class="demo-hint">Tap the phone to continue</div>
   </main>
 
   <aside class="notes">
     <h1>English onboarding prototype</h1>
     <p>The first session is now a router: consent, then eRx or shopping. Login, RedPoints, and push are delayed until the selected job makes them useful.</p>
-    <p>Use the buttons below or click the phone UI to move through the proposed flow.</p>
+    <p>Use Demo for a tap-through walkthrough, or jump to any individual screen for discussion.</p>
     <div class="nav">
+      <button data-demo-start>Demo</button>
       <button data-go="consent">Consent</button>
       <button data-go="intent">Intent split</button>
       <button data-go="shop-home">Shop branch</button>
@@ -593,29 +689,175 @@
       <button data-go="login-context">Contextual login</button>
       <button data-go="push-context">Contextual push</button>
     </div>
+    <div class="demo-card" aria-live="polite">
+      <div class="demo-meta" id="demoMeta">Demo step 1 of 8</div>
+      <h2 id="demoTitle">Start with consent</h2>
+      <p id="demoCopy">Tap the phone to move through the proposed journey. The sequence shows the shorter onboarding first, then the delayed moments where RedPoints, login, and push become relevant.</p>
+      <div class="demo-progress" id="demoProgress" aria-label="Demo progress"></div>
+      <div class="demo-actions">
+        <button data-demo-reset class="secondary">Restart</button>
+        <button data-demo-next>Next step</button>
+      </div>
+    </div>
   </aside>
 
   <script>
     const screens = Array.from(document.querySelectorAll(".screen"));
+    const navButtons = Array.from(document.querySelectorAll(".nav button"));
+    const demoMeta = document.getElementById("demoMeta");
+    const demoTitle = document.getElementById("demoTitle");
+    const demoCopy = document.getElementById("demoCopy");
+    const demoProgress = document.getElementById("demoProgress");
 
-    function show(name) {
+    const demoSteps = [
+      {
+        screen: "consent",
+        title: "Start with consent",
+        copy: "Keep the legal moment first, but avoid asking for marketing, login, rewards, and push before the user has chosen a job."
+      },
+      {
+        screen: "intent",
+        title: "Ask for intent, not account status",
+        copy: "The first product choice is simple: redeem an e-prescription or shop products and discounts. This preserves both high-value routes."
+      },
+      {
+        screen: "shop-home",
+        title: "Let shoppers reach value immediately",
+        copy: "Returning or guest shoppers land in browse mode with discount value visible. No account wall until cart, account, or checkout needs it."
+      },
+      {
+        screen: "cart-redpoints",
+        title: "Attach RedPoints to the cart",
+        copy: "Rewards become concrete when there is something to earn. The ask now has a clear benefit instead of feeling like onboarding admin."
+      },
+      {
+        screen: "push-context",
+        title: "Ask for push after a useful trigger",
+        copy: "Push now has a job: order status, prescription status, or saved-product discounts. That is a better reason than generic coupons."
+      },
+      {
+        screen: "intent",
+        title: "Return to the second branch",
+        copy: "The same onboarding split supports the e-prescription path without forcing shoppers through medical setup."
+      },
+      {
+        screen: "erx-setup",
+        title: "Introduce health card setup only when needed",
+        copy: "The card scan appears after the user chooses eRx, with a two-minute expectation and the next verification steps visible."
+      },
+      {
+        screen: "login-context",
+        title: "Delay login until identity is required",
+        copy: "Login is now framed as a security requirement for card setup, checkout, or account access, not as the price of entry."
+      }
+    ];
+
+    let demoMode = false;
+    let demoIndex = 0;
+
+    function show(name, options = {}) {
       const target = screens.find((screen) => screen.dataset.screen === name) || screens[0];
       screens.forEach((screen) => screen.classList.toggle("active", screen === target));
-      if (location.hash.slice(1) !== target.dataset.screen) {
-        history.replaceState(null, "", "#" + target.dataset.screen + location.search);
+      updateNav(target.dataset.screen);
+      if (!options.keepHash && location.hash.slice(1) !== target.dataset.screen) {
+        history.replaceState(null, "", "#" + target.dataset.screen);
       }
     }
 
+    function updateNav(activeScreen) {
+      navButtons.forEach((button) => {
+        const isDemo = button.hasAttribute("data-demo-start");
+        const isScreen = button.dataset.go === activeScreen;
+        button.classList.toggle("active", demoMode ? isDemo : isScreen);
+      });
+    }
+
+    function renderDemoProgress() {
+      demoProgress.innerHTML = "";
+      demoSteps.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = "demo-dot" + (index === demoIndex ? " active" : "");
+        demoProgress.append(dot);
+      });
+    }
+
+    function renderDemoStep() {
+      const step = demoSteps[demoIndex];
+      document.body.classList.add("demo");
+      demoMeta.textContent = "Demo step " + (demoIndex + 1) + " of " + demoSteps.length;
+      demoTitle.textContent = step.title;
+      demoCopy.textContent = step.copy;
+      renderDemoProgress();
+      show(step.screen, { keepHash: true });
+      if (location.hash.slice(1) !== "demo") {
+        history.replaceState(null, "", "#demo");
+      }
+    }
+
+    function startDemo(index = 0) {
+      demoMode = true;
+      demoIndex = index;
+      renderDemoStep();
+    }
+
+    function stopDemo() {
+      demoMode = false;
+      document.body.classList.remove("demo");
+    }
+
+    function advanceDemo() {
+      demoIndex = (demoIndex + 1) % demoSteps.length;
+      renderDemoStep();
+    }
+
+    function demoGo(screenName) {
+      const nextMatch = demoSteps.findIndex((step, index) => index > demoIndex && step.screen === screenName);
+      const anyMatch = demoSteps.findIndex((step) => step.screen === screenName);
+      demoIndex = nextMatch !== -1 ? nextMatch : anyMatch !== -1 ? anyMatch : (demoIndex + 1) % demoSteps.length;
+      renderDemoStep();
+    }
+
     document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-demo-start]")) {
+        startDemo();
+        return;
+      }
+
+      if (event.target.closest("[data-demo-next]")) {
+        advanceDemo();
+        return;
+      }
+
+      if (event.target.closest("[data-demo-reset]")) {
+        startDemo();
+        return;
+      }
+
       const target = event.target.closest("[data-go]");
-      if (target) show(target.dataset.go);
+      if (target) {
+        if (demoMode) {
+          demoGo(target.dataset.go);
+        } else {
+          show(target.dataset.go);
+        }
+        return;
+      }
+
+      if (demoMode && event.target.closest(".phone")) {
+        advanceDemo();
+      }
     });
 
     if (new URLSearchParams(location.search).has("capture")) {
       document.body.classList.add("capture");
     }
 
-    show(location.hash.slice(1) || "consent");
+    if (location.hash.slice(1) === "demo") {
+      startDemo();
+    } else {
+      stopDemo();
+      show(location.hash.slice(1) || "consent");
+    }
   </script>
 </body>
 </html>
