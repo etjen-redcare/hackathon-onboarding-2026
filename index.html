@@ -717,10 +717,18 @@
       font-size: 27px;
     }
 
+    .presentation-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
     .download-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: auto;
       min-height: 40px;
       padding: 0 16px;
       border-radius: 999px;
@@ -730,6 +738,12 @@
       font-weight: 900;
       text-decoration: none;
       white-space: nowrap;
+    }
+
+    .fullscreen-button {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--red);
     }
 
     .slide-stage {
@@ -748,6 +762,51 @@
       object-fit: contain;
       background: white;
       display: block;
+    }
+
+    .presentation-shell:fullscreen,
+    body.presentation.fullscreen-presentation .presentation-shell {
+      display: block;
+      width: 100vw;
+      max-width: none;
+      height: 100vh;
+      margin: 0;
+      padding: 22px;
+      background: #f4f7f7;
+    }
+
+    .presentation-shell:fullscreen .presentation-frame,
+    body.presentation.fullscreen-presentation .presentation-frame {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 22px;
+      box-shadow: none;
+    }
+
+    .presentation-shell:fullscreen .slide-stage,
+    body.presentation.fullscreen-presentation .slide-stage {
+      flex: 1;
+      min-height: 0;
+      aspect-ratio: auto;
+    }
+
+    .presentation-shell:fullscreen .thumb-strip,
+    body.presentation.fullscreen-presentation .thumb-strip {
+      grid-template-columns: repeat(9, minmax(84px, 1fr));
+      max-height: 96px;
+    }
+
+    body.presentation.fullscreen-presentation {
+      display: block;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body.presentation.fullscreen-presentation .presentation-shell {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
     }
 
     .presentation-controls {
@@ -1036,7 +1095,10 @@
           <h1>Onboarding recommendation deck</h1>
           <p>Use the controls, thumbnails, or keyboard arrows to move through the story.</p>
         </div>
-        <a class="download-link" href="presentation/redcare-onboarding-recommendation-deck.pptx" download>Download PPTX</a>
+        <div class="presentation-actions">
+          <button class="download-link fullscreen-button" data-presentation-fullscreen type="button">Fullscreen</button>
+          <a class="download-link" href="presentation/redcare-onboarding-recommendation-deck.pptx" download>Download PPTX</a>
+        </div>
       </div>
       <div class="slide-stage">
         <img id="presentationSlide" alt="Presentation slide 1">
@@ -1107,6 +1169,8 @@
     const presentationSlide = document.getElementById("presentationSlide");
     const slideCounter = document.getElementById("slideCounter");
     const slideThumbs = document.getElementById("slideThumbs");
+    const presentationShell = document.querySelector(".presentation-shell");
+    const fullscreenButton = document.querySelector("[data-presentation-fullscreen]");
     const metricStart = document.getElementById("metricStart");
     const metricReached = document.getElementById("metricReached");
     const metricConversion = document.getElementById("metricConversion");
@@ -1283,6 +1347,36 @@
       showPresentation(slideIndex + step);
     }
 
+    function isPresentationFullscreen() {
+      return document.fullscreenElement === presentationShell || document.body.classList.contains("fullscreen-presentation");
+    }
+
+    async function togglePresentationFullscreen() {
+      showPresentation();
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      if (document.body.classList.contains("fullscreen-presentation")) {
+        document.body.classList.remove("fullscreen-presentation");
+        fullscreenButton.textContent = isPresentationFullscreen() ? "Exit fullscreen" : "Fullscreen";
+        return;
+      }
+
+      try {
+        if (presentationShell.requestFullscreen) {
+          await presentationShell.requestFullscreen();
+        } else {
+          document.body.classList.add("fullscreen-presentation");
+          fullscreenButton.textContent = "Exit fullscreen";
+        }
+      } catch (error) {
+        document.body.classList.add("fullscreen-presentation");
+        fullscreenButton.textContent = "Exit fullscreen";
+      }
+    }
+
     function formatNumber(value) {
       return new Intl.NumberFormat("en-US").format(value);
     }
@@ -1355,6 +1449,11 @@
         return;
       }
 
+      if (event.target.closest("[data-presentation-fullscreen]")) {
+        togglePresentationFullscreen();
+        return;
+      }
+
       const slideThumb = event.target.closest("[data-slide-index]");
       if (slideThumb) {
         showPresentation(Number(slideThumb.dataset.slideIndex));
@@ -1381,6 +1480,14 @@
       if (!document.body.classList.contains("presentation")) return;
       if (event.key === "ArrowRight") advanceSlide(1);
       if (event.key === "ArrowLeft") advanceSlide(-1);
+      if (event.key === "Escape" && document.body.classList.contains("fullscreen-presentation")) {
+        document.body.classList.remove("fullscreen-presentation");
+        fullscreenButton.textContent = "Fullscreen";
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      fullscreenButton.textContent = document.fullscreenElement === presentationShell ? "Exit fullscreen" : "Fullscreen";
     });
 
     if (new URLSearchParams(location.search).has("capture")) {
