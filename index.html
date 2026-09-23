@@ -282,6 +282,23 @@
       gap: 16px;
     }
 
+    .banner[data-go],
+    .product-action[data-go] {
+      cursor: pointer;
+    }
+
+    .mini-button {
+      min-height: 38px;
+      border-radius: 20px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .mini-button.secondary {
+      background: #fff1ea;
+      border: 1px solid var(--line);
+    }
+
     .chip-row {
       display: flex;
       gap: 10px;
@@ -375,12 +392,80 @@
       font-weight: 700;
     }
 
+    .notice.peach {
+      background: var(--soft);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
     .cart-item {
       background: white;
       border-radius: 22px;
       padding: 16px;
       border: 1px solid var(--line);
       margin: 12px 0;
+    }
+
+    .compact-card {
+      background: white;
+      border-radius: 22px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(35, 20, 16, 0.06);
+      margin-top: 12px;
+    }
+
+    .compact-card h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .email-option {
+      height: 44px;
+      border-radius: 22px;
+      border: 1px solid #e7e0dc;
+      margin-top: 10px;
+      padding: 12px 14px;
+      color: #9b928e;
+      background: #fffaf8;
+      font-size: 13px;
+    }
+
+    .coupon-hero {
+      background: linear-gradient(135deg, #fff1ea 0%, #ffe3d6 100%);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 22px;
+      margin-bottom: 14px;
+      min-height: 238px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .coupon-hero h1 {
+      font-size: 32px;
+      margin-top: 14px;
+    }
+
+    .price-card {
+      background: white;
+      border-radius: 26px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(50, 26, 18, 0.08);
+      margin-bottom: 14px;
+    }
+
+    .saved-pill {
+      width: fit-content;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--mint);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 12px;
     }
 
     .login-box {
@@ -734,11 +819,11 @@
 
     <section class="screen" data-screen="shop-home">
       <div class="search">Search products, symptoms, brands</div>
-      <div class="banner">
+      <div class="banner" data-go="coupon-notify">
         <div class="discount">-20%</div>
         <div>
           <h2>Welcome saving</h2>
-          <p>Use your first-order discount on everyday health essentials.</p>
+          <p>Use your first-order discount on everyday health essentials. Tap to view coupon.</p>
         </div>
       </div>
       <div class="chip-row">
@@ -751,7 +836,8 @@
           <div class="discount">-22%</div>
           <strong>Vitamin D3 2000</strong>
           <p style="margin-top:6px;">12.99 &euro;</p>
-          <button style="margin-top:14px; min-height:42px;" data-go="cart-redpoints">Add</button>
+          <button class="mini-button secondary product-action" data-go="favorite-notify">Save</button>
+          <button class="mini-button" data-go="cart-redpoints">Add</button>
         </div>
         <div class="product">
           <div class="discount">-29%</div>
@@ -768,6 +854,47 @@
       </div>
     </section>
 
+    <section class="screen" data-screen="coupon-notify">
+      <div class="coupon-hero">
+        <div>
+          <div class="discount">-20%</div>
+          <h1>20% off selected essentials</h1>
+        </div>
+        <p>Guest users can browse and use the coupon without an account. The communication ask appears only after this coupon has intent.</p>
+      </div>
+      <div class="compact-card">
+        <div class="demo-meta">Guest communication moment</div>
+        <h2>Notify me before this offer ends</h2>
+        <p>This is a concrete push reason: the guest has viewed a coupon and may lose value if they forget.</p>
+        <button class="mini-button" data-go="shop-home">Enable coupon reminder</button>
+        <button class="mini-button secondary" data-go="shop-home">No thanks</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="secondary" data-go="favorite-notify">Next: save a product</button>
+    </section>
+
+    <section class="screen" data-screen="favorite-notify">
+      <div class="price-card">
+        <div class="saved-pill">Saved to favorites</div>
+        <div class="row">
+          <div class="discount">-22%</div>
+          <div>
+            <h2>Vitamin D3 2000</h2>
+            <p>Current price 12.99 &euro;. Guest users can still get a useful alert without creating an account.</p>
+          </div>
+        </div>
+      </div>
+      <div class="compact-card">
+        <div class="demo-meta">High-intent guest trigger</div>
+        <h2>Get price drop alerts?</h2>
+        <p>Push now has a narrow promise: tell me when this exact saved product gets cheaper.</p>
+        <button class="mini-button" data-go="shop-home">Enable price alerts</button>
+        <div class="email-option">Or email me price alerts</div>
+      </div>
+      <div class="spacer"></div>
+      <button data-go="cart-redpoints">Next: add to cart</button>
+    </section>
+
     <section class="screen" data-screen="cart-redpoints">
       <h1>Your cart</h1>
       <div class="cart-item">
@@ -779,11 +906,15 @@
           </div>
         </div>
       </div>
-      <div class="notice">
+      <div class="notice peach">
+        Get a reminder before your cart discount expires. This works for guests without requiring an account.
+      </div>
+      <button class="mini-button">Enable cart reminder</button>
+      <div class="email-option">Or send this cart link to my email</div>
+      <div class="notice" style="margin-top:12px;">
         This order earns 94 RedPoints. Join free and collect them at checkout.
       </div>
-      <button style="margin-top:14px;">Join and collect RedPoints</button>
-      <button class="secondary" style="margin-top:12px;" data-go="push-context">Continue without points</button>
+      <button class="mini-button secondary">Join and collect RedPoints</button>
       <div class="spacer"></div>
       <button data-go="push-context">Checkout</button>
     </section>
@@ -824,9 +955,10 @@
         </div>
       </div>
       <div class="card">
-        <h1>Get useful updates</h1>
-        <p>Now that there is an order or card setup in progress, push has a clear job: delivery, prescription status, or saved-product discounts.</p>
-        <button style="margin-top:18px;">Activate status updates</button>
+        <h1>Track your order</h1>
+        <p>Now that checkout has started, push has a clear job: delivery, order status, or prescription status. If the guest prefers not to enable push, email can still cover receipt and delivery updates.</p>
+        <button style="margin-top:18px;">Enable delivery updates</button>
+        <div class="email-option">Or email me order updates</div>
         <button class="secondary" style="margin-top:12px;" data-go="shop-home">Decide later</button>
       </div>
     </section>
@@ -857,22 +989,24 @@
   <aside class="notes">
     <h1>Redcare onboarding improvement</h1>
     <p>This project explores how Redcare can improve first-session retention and conversion by getting users to value faster: redeem an e-prescription with a German health insurance card, or shop products and discounts.</p>
-    <p>The proposal keeps onboarding light, then delays login, RedPoints, and push permissions until the selected task makes those asks useful. Use Demo for a tap-through walkthrough, or jump to any screen for discussion.</p>
+    <p>The proposal keeps onboarding light, then delays login, RedPoints, and push permissions until the selected task makes those asks useful. For guests, communication moves to high-intent moments: coupon viewed, product saved, cart created, or checkout started.</p>
     <div class="nav">
       <button data-demo-start>Demo</button>
       <button data-presentation-start>Presentation</button>
       <button data-go="consent">Consent</button>
       <button data-go="intent">Intent split</button>
       <button data-go="shop-home">Shop branch</button>
-      <button data-go="cart-redpoints">Cart RedPoints</button>
+      <button data-go="coupon-notify">Coupon reminder</button>
+      <button data-go="favorite-notify">Price alert</button>
+      <button data-go="cart-redpoints">Cart reminder</button>
       <button data-go="erx-setup">eRx card setup</button>
       <button data-go="login-context">Contextual login</button>
       <button data-go="push-context">Contextual push</button>
     </div>
     <div class="demo-card" aria-live="polite">
-      <div class="demo-meta" id="demoMeta">Demo step 1 of 8</div>
+      <div class="demo-meta" id="demoMeta">Demo step 1 of 10</div>
       <h2 id="demoTitle">Start with consent</h2>
-      <p id="demoCopy">Tap the phone to move through the proposed journey. The sequence shows the shorter onboarding first, then the delayed moments where RedPoints, login, and push become relevant.</p>
+      <p id="demoCopy">Tap the phone to move through the proposed journey. The sequence shows the shorter onboarding first, then contextual guest communication moments before checkout and eRx setup.</p>
       <div class="demo-progress" id="demoProgress" aria-label="Demo progress"></div>
       <div class="demo-actions">
         <button data-demo-reset class="secondary">Restart</button>
@@ -920,14 +1054,24 @@
         copy: "Returning or guest shoppers land in browse mode with discount value visible. No account wall until cart, account, or checkout needs it."
       },
       {
+        screen: "coupon-notify",
+        title: "Coupon viewed: ask with a reason",
+        copy: "For guests, push can be offered after they inspect a coupon: notify me before this offer ends. The promise is specific and time-bound."
+      },
+      {
+        screen: "favorite-notify",
+        title: "Favorite saved: price drop alerts",
+        copy: "Saving a product is enough intent to offer alerts. Email is a lightweight fallback when the guest does not want push."
+      },
+      {
         screen: "cart-redpoints",
-        title: "Attach RedPoints to the cart",
-        copy: "Rewards become concrete when there is something to earn. The ask now has a clear benefit instead of feeling like onboarding admin."
+        title: "Cart created: preserve the guest relationship",
+        copy: "After adding to cart, ask for a cart discount reminder or an email cart link. RedPoints stays attached to checkout value."
       },
       {
         screen: "push-context",
-        title: "Ask for push after a useful trigger",
-        copy: "Push now has a job: order status, prescription status, or saved-product discounts. That is a better reason than generic coupons."
+        title: "Checkout started: status updates",
+        copy: "At checkout, push has a job the guest understands: delivery, prescription status, or order updates."
       },
       {
         screen: "intent",
