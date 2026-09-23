@@ -993,15 +993,6 @@
     <div class="nav">
       <button data-demo-start>Demo</button>
       <button data-presentation-start>Presentation</button>
-      <button data-go="consent">Consent</button>
-      <button data-go="intent">Intent split</button>
-      <button data-go="shop-home">Shop branch</button>
-      <button data-go="coupon-notify">Coupon reminder</button>
-      <button data-go="favorite-notify">Price alert</button>
-      <button data-go="cart-redpoints">Cart reminder</button>
-      <button data-go="erx-setup">eRx card setup</button>
-      <button data-go="login-context">Contextual login</button>
-      <button data-go="push-context">Contextual push</button>
     </div>
     <div class="demo-card" aria-live="polite">
       <div class="demo-meta" id="demoMeta">Demo step 1 of 10</div>
@@ -1107,9 +1098,8 @@
       navButtons.forEach((button) => {
         const isDemo = button.hasAttribute("data-demo-start");
         const isPresentation = button.hasAttribute("data-presentation-start");
-        const isScreen = button.dataset.go === activeScreen;
         const presentationMode = document.body.classList.contains("presentation");
-        button.classList.toggle("active", presentationMode ? isPresentation : demoMode ? isDemo : isScreen);
+        button.classList.toggle("active", presentationMode ? isPresentation : demoMode && isDemo);
       });
     }
 
@@ -1267,14 +1257,16 @@
       document.body.classList.add("capture");
     }
 
-    if (location.hash.slice(1) === "presentation") {
+    const initialRoute = location.hash.slice(1);
+
+    if (initialRoute === "presentation") {
       showPresentation(0);
-    } else if (location.hash.slice(1) === "demo") {
+    } else if (initialRoute === "demo" || !initialRoute) {
       startDemo();
     } else {
       stopDemo();
       stopPresentation();
-      show(location.hash.slice(1) || "consent");
+      show(initialRoute);
     }
   </script>
 </body>
