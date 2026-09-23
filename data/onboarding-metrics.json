@@ -1,0 +1,13 @@
+{
+  "source": "FullStory",
+  "window": "Last 30 days",
+  "aggregation": "Unique users",
+  "scope": "Same session",
+  "funnel": "onboarding_started -> home",
+  "last_updated": "2026-09-23T15:13:51+02:00",
+  "start": 346802,
+  "reached_home": 298203,
+  "conversion_rate": 85.98652833605342,
+  "lost": 48599,
+  "loss_rate": 14.01347166394658
+}

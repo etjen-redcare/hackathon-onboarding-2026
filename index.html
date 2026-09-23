@@ -490,6 +490,23 @@
       max-width: 720px;
     }
 
+    .intro-card {
+      padding: 24px;
+      border-radius: 24px;
+      background: white;
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 32px rgba(40, 24, 18, 0.1);
+    }
+
+    .intro-kicker {
+      margin: 0 0 10px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
     .notes h1 {
       font-size: 44px;
       margin-bottom: 18px;
@@ -499,6 +516,61 @@
       font-size: 19px;
       max-width: 620px;
       margin-bottom: 20px;
+    }
+
+    .metric-card {
+      margin: 24px 0 4px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .metric-card h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .metric-card > p {
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric-cell {
+      min-height: 82px;
+      border-radius: 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 12px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .metric-value.red { color: var(--red); }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
     }
 
     .nav {
@@ -759,6 +831,10 @@
         padding-top: 0;
       }
 
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .thumb-strip {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -987,12 +1063,41 @@
   </section>
 
   <aside class="notes">
-    <h1>Redcare onboarding improvement</h1>
-    <p>This project explores how Redcare can improve first-session retention and conversion by getting users to value faster: redeem an e-prescription with a German health insurance card, or shop products and discounts.</p>
-    <p>The proposal keeps onboarding light, then delays login, RedPoints, and push permissions until the selected task makes those asks useful. For guests, communication moves to high-intent moments: coupon viewed, product saved, cart created, or checkout started.</p>
-    <div class="nav">
-      <button data-demo-start>Demo</button>
-      <button data-presentation-start>Presentation</button>
+    <div class="intro-card">
+      <p class="intro-kicker">FullStory snapshot: onboarding start to home screen</p>
+      <h1>Redcare onboarding improvement</h1>
+      <p>This project explores how Redcare can improve first-session retention and conversion by getting users to value faster: redeem an e-prescription with a German health insurance card, or shop products and discounts.</p>
+      <p>The proposal keeps onboarding light, then delays login, RedPoints, and push permissions until the selected task makes those asks useful. For guests, communication moves to high-intent moments: coupon viewed, product saved, cart created, or checkout started.</p>
+      <div class="metric-card" aria-label="FullStory onboarding completion metric">
+        <div class="demo-meta">Primary completion proxy</div>
+        <h2>onboarding_started &rarr; home</h2>
+        <p>Measures users who start onboarding and reach the app home screen in the same session. This is the cleanest current proxy for completing onboarding.</p>
+        <div class="metric-grid">
+          <div class="metric-cell">
+            <div class="metric-label">Start</div>
+            <div class="metric-value" id="metricStart">346,802</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Reached Home</div>
+            <div class="metric-value" id="metricReached">298,203</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Conversion</div>
+            <div class="metric-value" id="metricConversion">86.0%</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Lost</div>
+            <div class="metric-value red" id="metricLost">48,599</div>
+          </div>
+        </div>
+        <div class="metric-note">
+          Loss rate: <strong id="metricLossRate">14.0%</strong>. Source: <span id="metricSource">FullStory, last 30 days, unique users, same session</span>. Last updated: <span id="metricUpdated">2026-09-23 15:13</span>.
+        </div>
+      </div>
+      <div class="nav">
+        <button data-demo-start>Demo</button>
+        <button data-presentation-start>Presentation</button>
+      </div>
     </div>
     <div class="demo-card" aria-live="polite">
       <div class="demo-meta" id="demoMeta">Demo step 1 of 10</div>
@@ -1025,6 +1130,13 @@
     const presentationSlide = document.getElementById("presentationSlide");
     const slideCounter = document.getElementById("slideCounter");
     const slideThumbs = document.getElementById("slideThumbs");
+    const metricStart = document.getElementById("metricStart");
+    const metricReached = document.getElementById("metricReached");
+    const metricConversion = document.getElementById("metricConversion");
+    const metricLost = document.getElementById("metricLost");
+    const metricLossRate = document.getElementById("metricLossRate");
+    const metricSource = document.getElementById("metricSource");
+    const metricUpdated = document.getElementById("metricUpdated");
     const slideCount = 18;
     const slideImages = Array.from({ length: slideCount }, (_, index) => "presentation/slides/slide-" + (index + 1) + ".png");
 
@@ -1194,6 +1306,47 @@
       showPresentation(slideIndex + step);
     }
 
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US").format(value);
+    }
+
+    function formatPercent(value) {
+      return Number(value).toFixed(1) + "%";
+    }
+
+    function formatUpdated(value) {
+      if (!value) return "Snapshot";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function renderMetrics(data) {
+      metricStart.textContent = formatNumber(data.start);
+      metricReached.textContent = formatNumber(data.reached_home);
+      metricConversion.textContent = formatPercent(data.conversion_rate);
+      metricLost.textContent = formatNumber(data.lost);
+      metricLossRate.textContent = formatPercent(data.loss_rate);
+      metricSource.textContent = [data.source, data.window, data.aggregation, data.scope].filter(Boolean).join(", ");
+      metricUpdated.textContent = formatUpdated(data.last_updated);
+    }
+
+    async function loadMetrics() {
+      try {
+        const response = await fetch("data/onboarding-metrics.json", { cache: "no-store" });
+        if (!response.ok) return;
+        renderMetrics(await response.json());
+      } catch (error) {
+        // Keep the embedded snapshot when opened locally or when the JSON refresh is unavailable.
+      }
+    }
+
     document.addEventListener("click", (event) => {
       if (event.target.closest("[data-demo-start]")) {
         startDemo();
@@ -1268,6 +1421,8 @@
       stopPresentation();
       show(initialRoute);
     }
+
+    loadMetrics();
   </script>
 </body>
 </html>
