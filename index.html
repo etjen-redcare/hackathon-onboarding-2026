@@ -802,23 +802,6 @@
       display: block;
     }
 
-    .presentation-card {
-      display: none;
-      margin-top: 22px;
-      padding: 20px;
-      border-radius: 24px;
-      background: white;
-      border: 1px solid var(--line);
-      box-shadow: 0 14px 32px rgba(40, 24, 18, 0.1);
-    }
-
-    .presentation-card h2 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    body.presentation .presentation-card { display: block; }
-
     @media (max-width: 860px) {
       body {
         grid-template-columns: 1fr;
@@ -1110,15 +1093,6 @@
       <div class="demo-actions">
         <button data-demo-reset class="secondary">Restart</button>
         <button data-demo-next>Next step</button>
-      </div>
-    </div>
-    <div class="presentation-card">
-      <div class="demo-meta">Hosted deck</div>
-      <h2>Presentation mode</h2>
-      <p>The full 18-slide recommendation deck is hosted here as a slide viewer, with the PPTX available for download.</p>
-      <div class="demo-actions">
-        <button class="secondary" data-slide-prev>Previous</button>
-        <button data-slide-next>Next slide</button>
       </div>
     </div>
   </aside>
